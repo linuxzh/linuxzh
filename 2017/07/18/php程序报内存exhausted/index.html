@@ -1,0 +1,528 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+  
+    <title>php程序报内存exhausted | 狼叔</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="HongJ">
+    
+
+    
+    <meta name="description" content="php程序报内存exhausted今天在使用公司的固定资产系统导出数据时，在导出的过期中选择部分导出能成功的导出，选择全部就不能导出，程序报500的错误。 查看nginx的日志110.8.14.17 - - [18/Jul/2017:09:43:18 +0800] &amp;quot;POST /reports/custom HTTP/1.1&amp;quot; 500 5097 &amp;quot;http://pro">
+<meta name="keywords" content="troubleshoot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="php程序报内存exhausted">
+<meta property="og:url" content="http:www.wuday.cn/2017/07/18/php程序报内存exhausted/index.html">
+<meta property="og:site_name" content="狼叔">
+<meta property="og:description" content="php程序报内存exhausted今天在使用公司的固定资产系统导出数据时，在导出的过期中选择部分导出能成功的导出，选择全部就不能导出，程序报500的错误。 查看nginx的日志110.8.14.17 - - [18/Jul/2017:09:43:18 +0800] &amp;quot;POST /reports/custom HTTP/1.1&amp;quot; 500 5097 &amp;quot;http://pro">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-01T10:25:37.800Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="php程序报内存exhausted">
+<meta name="twitter:description" content="php程序报内存exhausted今天在使用公司的固定资产系统导出数据时，在导出的过期中选择部分导出能成功的导出，选择全部就不能导出，程序报500的错误。 查看nginx的日志110.8.14.17 - - [18/Jul/2017:09:43:18 +0800] &amp;quot;POST /reports/custom HTTP/1.1&amp;quot; 500 5097 &amp;quot;http://pro">
+
+    
+    <link rel="alternative" href="/atom.xml" title="狼叔" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="狼叔" title="狼叔"></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="狼叔">狼叔</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/categories/linux">Linux</a></li>
+					
+						<li><a href="/categories/db">数据库</a></li>
+					
+						<li><a href="/categories/architect">架构</a></li>
+					
+						<li><a href="/categories/web">Web</a></li>
+					
+						<li><a href="/categories/monit">监控</a></li>
+					
+						<li><a href="/categories/virtualization">虚拟化</a></li>
+					
+						<li><a href="/categories/automate">自动化</a></li>
+					
+						<li><a href="/categories/python">Python</a></li>
+					
+						<li><a href="/categories/troubleshoot">Troubleshoot</a></li>
+					
+						<li><a href="/archives">目录</a></li>
+					
+						<li><a href="/about">关于</a></li>
+					
+					<li>
+ 					
+						<form class="search" action="http://zhannei.baidu.com/cse/search" target="_blank">
+							<label>Search</label>
+						<input name="s" type="hidden" value=""><input type="text" name="q" size="30" placeholder="搜索"><br>
+						</form>
+					
+					</li>
+				</ul>
+			</ul></nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope="" itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2017/07/18/php程序报内存exhausted/" title="php程序报内存exhausted" itemprop="url">php程序报内存exhausted</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="HongJ" target="_blank" itemprop="author">HongJ</a>
+		
+  </p><p class="article-time">
+    <time datetime="2017-07-18T02:37:00.000Z" itemprop="datePublished"> 发表于 2017-07-18</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#php程序报内存exhausted"><span class="toc-number">1.</span> <span class="toc-text">php程序报内存exhausted</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#查看nginx的日志"><span class="toc-number">1.1.</span> <span class="toc-text">查看nginx的日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查看docker容器中的日志"><span class="toc-number">1.2.</span> <span class="toc-text">查看docker容器中的日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#提取日志的关键信息"><span class="toc-number">1.3.</span> <span class="toc-text">提取日志的关键信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析问题"><span class="toc-number">1.4.</span> <span class="toc-text">分析问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#解决问题"><span class="toc-number">2.</span> <span class="toc-text">解决问题</span></a></li></ol>
+		
+		</div>
+		
+		<h1 id="php程序报内存exhausted"><a href="#php程序报内存exhausted" class="headerlink" title="php程序报内存exhausted"></a>php程序报内存exhausted</h1><p>今天在使用公司的固定资产系统导出数据时，在导出的过期中选择部分导出能成功的导出，选择全部就不能导出，程序报500的错误。</p>
+<h2 id="查看nginx的日志"><a href="#查看nginx的日志" class="headerlink" title="查看nginx的日志"></a>查看nginx的日志</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.8.14.17 - - [18/Jul/2017:09:43:18 +0800] &quot;POST /reports/custom HTTP/1.1&quot; 500 5097 &quot;http://property.intra.ks.com/reports/custom&quot; &quot;Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="查看docker容器中的日志"><a href="#查看docker容器中的日志" class="headerlink" title="查看docker容器中的日志"></a>查看docker容器中的日志</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[Tue Jul 18 01:43:18.182724 2017] [:error] [pid 37] [client 172.17.42.1:46109] PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 196605 bytes) in /var/www/html/vendor/laravel/framework/src/Illuminate/Database/Connection.php on line 301, referer: http://property.intra.ks.com/reports/custom</span><br></pre></td></tr></table></figure>
+<h2 id="提取日志的关键信息"><a href="#提取日志的关键信息" class="headerlink" title="提取日志的关键信息"></a>提取日志的关键信息</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PHP Fatal error:  Allowed memory size of 134217728 bytes exhausted (tried to allocate 196605 bytes) in</span><br></pre></td></tr></table></figure>
+<h2 id="分析问题"><a href="#分析问题" class="headerlink" title="分析问题"></a>分析问题</h2><ol>
+<li>php程序在缓存数据内存的存储空间不足；</li>
+<li>可修改程序文件；</li>
+<li>可修改<code>php.ini</code>配置文件，这里选择修改配置文件;</li>
+</ol>
+<h1 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h1><p>修改<code>php.ini</code>配置文件，将配置的<code>memory_limit</code>的值调大，然后重启php程序或httpd程序在进行测试</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/troubleshoot/">troubleshoot</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/troubleshoot/">troubleshoot</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http:www.wuday.cn/2017/07/18/php程序报内存exhausted/" data-title="php程序报内存exhausted | 狼叔" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev">
+ <a href="/2017/08/29/ssh-login/" title="如何查找ssh keys登录的用户">
+  <strong>上一篇：</strong><br>
+  <span>
+  如何查找ssh keys登录的用户</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2017/06/29/ifcfg/" title="ifconfig命令">
+ <strong>下一篇：</strong><br> 
+ <span>ifconfig命令
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2017/07/18/php程序报内存exhausted/" data-title="php程序报内存exhausted" data-url="http:www.wuday.cn/2017/07/18/php程序报内存exhausted/"></div>
+</section>
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#php程序报内存exhausted"><span class="toc-number">1.</span> <span class="toc-text">php程序报内存exhausted</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#查看nginx的日志"><span class="toc-number">1.1.</span> <span class="toc-text">查看nginx的日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查看docker容器中的日志"><span class="toc-number">1.2.</span> <span class="toc-text">查看docker容器中的日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#提取日志的关键信息"><span class="toc-number">1.3.</span> <span class="toc-text">提取日志的关键信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分析问题"><span class="toc-number">1.4.</span> <span class="toc-text">分析问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#解决问题"><span class="toc-number">2.</span> <span class="toc-text">解决问题</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/db/" title="db">db<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/linux/" title="linux">linux<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/troubleshoot/" title="troubleshoot">troubleshoot<sup>3</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/linux/" title="linux">linux<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/troubleshoot/" title="troubleshoot">troubleshoot<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/db/" title="db">db<sup>2</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="http://www.wuday.cn" target="_blank" title="一个运维交流新时代社区">HongJ</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  
+
+
+  <div class="rsspart">
+	<a href="/atom.xml" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self" frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=&verifier=&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer">
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m 狼叔. <br>
+			为运维DevOps奋斗,突破舒适区。</p>
+	</section>
+	 
+	<div class="social-font">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2018 
+		
+		<a href="/about" target="_blank" title="HongJ">HongJ</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+        getSize();
+        if (myWidth >= 1024) {
+          c.click();
+        }
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"HongJ"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
